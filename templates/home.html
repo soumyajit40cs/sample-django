@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+<header class="masthead" style="background-image: url('{% static "img/home-bg.jpg" %}')">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="site-heading">
+          <h1>Clean Blog</h1>
+          <span class="subheading">A Blog Theme by Start Bootstrap</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 col-md-10 mx-auto">
+      {% if postodj %}
+      {% for postdata in postodj %}
+            <div class="post-preview">
+              <a href="{% url 'post_detials' postdata.id %}">
+                <h2 class="post-title">
+                {{ postdata.title|title }}
+                </h2>
+                <!-- <h3 class="post-subtitle">
+                  {{ postdata.text|slice:":35"|striptags }}
+                </h3> -->
+              </a>
+              <p class="post-meta">Posted by
+                <a href="javascript:void(0)">{{ postdata.author }}</a>
+                on {{ postdata.created_date|date:'D, d M, Y' }}</p>
+            </div>
+            <hr>
+        {% endfor %}
+        {% else %}
+        <p>No Data found</p>
+        {% endif %}
+
+      <!-- Pager -->
+      <div class="clearfix">
+        <a class="btn btn-primary float-right" href="#">Older Posts &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.highcharts.com/highcharts.src.js"></script>
+  <div class="row" id="datacontainer"></div>
+            <script>
+              Highcharts.chart('datacontainer', {
+                  chart: {
+                      type: 'column'
+                  },
+                  title: {
+                      text: 'Historic World Population by Region'
+                  },
+                  xAxis: {
+                      categories: ['Africa', 'America', 'Asia', 'Europe', 'Oceania']
+                  },
+                  series: [{
+                      name: 'Year 1800',
+                      data: [107, 31, 635, 203, 2]
+                  }, {
+                      name: 'Year 1900',
+                      data: [133, 156, 947, 408, 6]
+                  }, {
+                      name: 'Year 2012',
+                      data: [1052, 954, 4250, 740, 38]
+                  }]
+              });
+            </script>
+
+
+            <div class="row" id="usercontainer"></div>
+                      <script>
+                        Highcharts.chart('usercontainer', {
+                            chart: {
+                                type: 'column'
+                            },
+                            title: {
+                                text: "Post report's"
+                            },
+                            xAxis: {
+                                categories: [{% for entry in userdataobj %}'{{ entry.published_date }}'{% if not forloop.last %}, {% endif %}{% endfor %}]
+                            },
+                            series: [{
+                              name: 'No Of Post',
+                              data: [{% for entry in userdataobj %}{{ entry.created_count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                              color: 'blue'
+                            }]
+                        });
+                      </script>
+
+
+
+
+
+
+
+</div>
+
+
+{% endblock %}
