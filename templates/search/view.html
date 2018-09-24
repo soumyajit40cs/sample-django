@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load poll_extras %}
+{% block content %}
+
+<header class="masthead" style="background-image: url('{% static "img/home-bg.jpg" %}')">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="site-heading">
+          <h1>Clean Blog</h1>
+          <span class="subheading">A Blog Theme by Start Bootstrap</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+
+<div class="container">
+
+  <div class='row'>
+      <div class='col-12 col-md-6 mx-auto my-5 py-5'>
+      <form method='GET' class='' action='.'>
+          <div class="input-group form-group-no-border mx-auto">
+              <input type="text" name="q" data-toggle="popover" data-placement="bottom" data-content="Press enter to search" class="form-control cfe-nav mt-0 py-3" placeholder="Search..." value="" style="" data-original-title="" title="" autofocus="autofocus">
+          </div>
+      </form>
+      </div>
+  </div>
+
+
+
+  <div class="row">
+    <div class="col-lg-8 col-md-10 mx-auto">
+      {% if object_list %}
+      {% for object in object_list %}
+      {% with object|class_name as datatype %}
+      {% if datatype == 'Post' %}
+            <div class="post-preview">
+              <a href="{% url 'post_detials' object.id %}">
+                <h2 class="post-title">{{ object.title }}</h2>
+                <p class="post-meta">Posted by
+                  <a href="javascript:void(0)">{{ object.author }}</a>
+                  on {{ object.created_date|date:'D, d M, Y' }}
+                </p>
+              </a>
+            </div>
+            <hr>
+      {% endif %}
+      {% endwith %}
+      {% endfor %}
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
