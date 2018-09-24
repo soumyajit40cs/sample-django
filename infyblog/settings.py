@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -38,9 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_python3_ldap',
-    'smart_selects',
+    'easy_thumbnails',
     'ckeditor',
     'ckeditor_uploader',
+    'smart_selects',
     'blog'
 ]
 
@@ -123,15 +125,23 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'assets'),
 )
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_REDIRECT_URL = '/'
+
+# Thumbnails configuration #
+THUMBNAIL_ALIASES = {
+    '': {
+        'avatar': {'size': (50, 50), 'crop': True},
+        'midlarge': {'size': (100, 100), 'crop': False},
+    },
+}
 
 
 
@@ -150,8 +160,6 @@ CKEDITOR_CONFIGS = {
     },
 }
 
-################   LDAP CONFIG
-
 
 # The URL of the LDAP server.
 LDAP_AUTH_URL = "ldap://ldap.forumsys.com:389"
@@ -160,13 +168,11 @@ LDAP_AUTH_URL = "ldap://ldap.forumsys.com:389"
 LDAP_AUTH_USE_TLS = False
 
 # The LDAP search base for looking up users.
+#LDAP_AUTH_SEARCH_BASE = "cn=read-only-admin,dc=example,dc=com"
 LDAP_AUTH_SEARCH_BASE = "cn=read-only-admin,dc=example,dc=com"
-#ldap://ldap.forumsys.com:389/dc=example,dc=com
-#ou=mathematicians,dc=example,dc=com
-#ldap://ldap.forumsys.com:389/dc=example,dc=com??one?(objectClass=*)
 
 # The LDAP class that represents a user.
-LDAP_AUTH_OBJECT_CLASS = "organization"
+LDAP_AUTH_OBJECT_CLASS = "mathematicians"
 
 # User model fields mapped to the LDAP
 # attributes that represent them.
@@ -180,22 +186,21 @@ LDAP_AUTH_USER_FIELDS = {
 # A tuple of django model fields used to uniquely identify a user.
 LDAP_AUTH_USER_LOOKUP_FIELDS = ("username",)
 LDAP_AUTH_CLEAN_USER_DATA = "django_python3_ldap.utils.clean_user_data"
-
 LDAP_AUTH_SYNC_USER_RELATIONS = "django_python3_ldap.utils.sync_user_relations"
-
 LDAP_AUTH_FORMAT_SEARCH_FILTERS = "django_python3_ldap.utils.format_search_filters"
-
-LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
+LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_openldap"
+LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = None
+LDAP_AUTH_CONNECT_TIMEOUT = None
+LDAP_AUTH_RECEIVE_TIMEOUT = None
 #LDAP_AUTH_CONNECTION_USERNAME = 'username'
 LDAP_AUTH_CONNECTION_PASSWORD = 'password'
 
 #LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "ECDC"
-LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = None
 AUTHENTICATION_BACKENDS = (
 'django_python3_ldap.auth.LDAPBackend',
 'django.contrib.auth.backends.ModelBackend',
 )
-'''
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -211,4 +216,3 @@ LOGGING = {
         },
     },
 }
-'''
