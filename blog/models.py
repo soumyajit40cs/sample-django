@@ -4,53 +4,68 @@ from django.urls import reverse
 #from ckeditor_uploader.fields import RichTextField, RichTextUploadingField
 from ckeditor.fields import RichTextField
 from smart_selects.db_fields import ChainedForeignKey, ChainedManyToManyField, GroupedForeignKey
+from easy_thumbnails.fields import ThumbnailerImageField
+from django.db.models import Q
 
-
-class Category(models.Model):
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return "%s" % self.name
-
-class Subcategory(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE,)
-    name = models.CharField(max_length=255)
+class Continent(models.Model):
+    name = models.CharField(max_length=255,default=None)
 
     def __str__(self):
         return "%s" % self.name
 
+class Country(models.Model):
+    continent = models.ForeignKey(Continent, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255,default=None)
+
+    def __str__(self):
+        return "%s" % self.name
 
 class Contact(models.Model):
     name = models.CharField(max_length=264)
+    continent = models.ForeignKey(Continent, on_delete=models.CASCADE, default=None)
+    country = ChainedForeignKey(
+        'Country',
+        chained_field="continent",
+        chained_model_field="continent",
+        show_all=False,
+        auto_choose=True,
+        default=None
+    )
     email = models.EmailField()
-    phone = models.TextField()
-    message = models.TextField()
+    phone = models.CharField(max_length=264)
+    message = models.CharField(max_length=264)
+    #message = RichTextField()
     message_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.name
 
 
+class PostManager(models.Manager):
+    def search(self, query=None):
+        qs = self.get_queryset()
+        if query is not None:
+            or_lookup = (Q(title__icontains=query)|
+                         Q(text__icontains=query)|
+                         Q(author__username__icontains=query)
+                        )
+            qs = qs.filter(or_lookup).distinct() # distinct() is often necessary with Q lookups
+        return qs
+
 
 class Post(models.Model):
     author = models.ForeignKey('auth.User',on_delete=models.CASCADE,)
     title = models.CharField(max_length=200)
-    '''
-    Category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
-    subcategory = ChainedForeignKey(
-        'Subcategory',
-        chained_field="category",
-        chained_model_field="category",
-        #show_all=False,
-        #auto_choose=True,
-        #default=None,
-        null=True
-    )
-    '''
     #text = models.TextField()
     text = RichTextField()
+    photo = ThumbnailerImageField(upload_to='post_photos', blank=True)
     created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
+
+    objects         = PostManager()
+
+    class Meta:
+        verbose_name_plural = "All Post"
 
     def publish(self):
         self.published_date = timezone.now()
